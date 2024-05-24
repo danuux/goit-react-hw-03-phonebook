@@ -4,7 +4,6 @@ import Contact from './Contact/Contact';
 import ContactList from './ContactList/ContactList';
 import Filter from './Filter/Filter';
 
-
 export class App extends Component {
   state = {
     contacts: [
@@ -15,6 +14,19 @@ export class App extends Component {
     ],
     filter: '',
   };
+
+  componentDidMount() {
+    const storedContacts = localStorage.getItem('contacts');
+    if (storedContacts) {
+      this.setState({ contacts: JSON.parse(storedContacts) });
+    }
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    if (prevState.contacts !== this.state.contacts) {
+      localStorage.setItem('contacts', JSON.stringify(this.state.contacts));
+    }
+  }
 
   addContact = ({ name, number }) => {
     const normalizedName = name.toLowerCase();
@@ -30,18 +42,20 @@ export class App extends Component {
     if (isAdded) {
       return;
     }
+
     const contact = {
       id: nanoid(),
       name: name,
       number: number,
     };
+
     this.setState(prevState => ({
       contacts: [...prevState.contacts, contact],
     }));
   };
 
-  changeFilter = e => {
-    this.setState({ filter: e.currentTarget.value });
+  changeFilter = event => {
+    this.setState({ filter: event.currentTarget.value });
   };
 
   getVisibleContacts = () => {
@@ -88,4 +102,3 @@ export class App extends Component {
     );
   }
 }
-
